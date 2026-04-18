@@ -1,4 +1,4 @@
-name: Build crDroid Kernel surya
+name: Build LiCIK Kernel surya
 
 on:
   push:
@@ -15,9 +15,11 @@ jobs:
           echo "DATE=$(TZ=Asia/Jakarta date +%Y%m%d%H%M)" >> $GITHUB_OUTPUT
 
   build_kernel:
-    name: Build Kernel
+    name: Build LiCIK Kernel
     runs-on: ubuntu-latest
     needs: prepare
+    outputs:
+      KV: ${{ steps.kernel_version.outputs.KV }}
 
     steps:
     - name: Checkout Workflow & Local Configs
@@ -71,6 +73,16 @@ jobs:
         chmod +x kernel_workspace/build.sh
         ./patch/buildpatchCR.sh kernel_workspace/build.sh
 
+    - name: Extract Kernel Version
+      id: kernel_version
+      run: |
+        cd kernel_workspace
+        VERSION=$(grep "^VERSION =" Makefile | awk '{print $3}')
+        PATCHLEVEL=$(grep "^PATCHLEVEL =" Makefile | awk '{print $3}')
+        SUBLEVEL=$(grep "^SUBLEVEL =" Makefile | awk '{print $3}')
+        EXTRAVERSION=$(grep "^EXTRAVERSION =" Makefile | awk '{print $3}')
+        echo "KV=$VERSION.$PATCHLEVEL.$SUBLEVEL$EXTRAVERSION" >> $GITHUB_OUTPUT
+
     - name: Building
       run: |
         cd kernel_workspace
@@ -83,5 +95,33 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: crDroid-surya-${{ env.DATE }}
+        name: LiCIK-surya-${{ env.DATE }}
         path: ${{ env.ARTIFACT }}/*
+
+  create_release:
+    name: Create Release
+    needs: [prepare, build_kernel]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifact
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.prepare.outputs.DATE }}
+          files: artifact/**/*
+          body: |
+            ## LiCIK Kernel for surya
+
+            **Author:** crdroidandroid
+            **Kernel Source:** https://github.com/crdroidandroid/android_kernel_xiaomi_surya
+            **Kernel Version:** ${{ needs.build_kernel.outputs.KV }}
+            **Build Date:** ${{ needs.prepare.outputs.DATE }}

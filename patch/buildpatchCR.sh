@@ -9,7 +9,10 @@ if [ -f "$BUILD_SCRIPT" ]; then
     # Kita menggunakan regex yang mendukung opsi variasi spasi atau argumen lain
     sed -i 's/\(make[[:space:]].*\$DEFCONFIG\)/\1 droidspaces.config droidspaces-additional.config/' "$BUILD_SCRIPT"
 
-    echo "Patching selesai. Perintah make sekarang menyertakan Droidspaces configs."
+    # Ganti ZIPNAME prefix menjadi LiCIK
+    sed -i 's/ZIPNAME="Shinigami/ZIPNAME="LiCIK/' "$BUILD_SCRIPT"
+
+    echo "Patching selesai. Perintah make sekarang menyertakan Droidspaces configs dan ZIPNAME telah diperbarui."
 else
     echo "Error: File $BUILD_SCRIPT tidak ditemukan!"
     exit 1
