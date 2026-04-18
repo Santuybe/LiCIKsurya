@@ -75,10 +75,10 @@ jobs:
 
     - name: Patch build.sh
       run: |
-        chmod +x patch/buildpatch.sh
+        chmod +x patch/buildpatchCR.sh
         # build.sh crDroid biasanya ada di root source kernel
         chmod +x kernel_workspace/build.sh
-        ./patch/buildpatch.sh kernel_workspace/build.sh
+        ./patch/buildpatchCR.sh kernel_workspace/build.sh
 
     - name: Building
       run: |
