@@ -18,13 +18,6 @@ jobs:
     name: Build Kernel
     runs-on: ubuntu-latest
     needs: prepare
-    strategy:
-      matrix:
-        include:
-          - variant: "Tiramisu"
-            root: "KSU"
-          - variant: "SnowCone"
-            root: "NoKSU"
 
     steps:
     - name: Checkout Workflow & Local Configs
@@ -32,8 +25,6 @@ jobs:
 
     - name: Set environment
       run: |
-        echo "VARIANT=${{ matrix.variant }}" >> $GITHUB_ENV
-        echo "ROOT=${{ matrix.root }}" >> $GITHUB_ENV
         echo "DATE=${{ needs.prepare.outputs.DATE }}" >> $GITHUB_ENV
         echo "ARTIFACT=$GITHUB_WORKSPACE/artifact" >> $GITHUB_ENV
         echo "KERNEL_URL=https://github.com/crdroidandroid/android_kernel_xiaomi_surya.git" >> $GITHUB_ENV
@@ -42,7 +33,7 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt update
-        sudo apt install -y device-tree-compiler bc build-essential flex bison libssl-dev libelf-dev clang lld wget
+        sudo apt install -y device-tree-compiler bc build-essential flex bison libssl-dev libelf-dev clang lld wget python3 gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
         mkdir -p ${{ env.ARTIFACT }}
 
     - name: Fetch crDroid Kernel Source
@@ -83,10 +74,14 @@ jobs:
     - name: Building
       run: |
         cd kernel_workspace
-        ./build.sh ${{ env.VARIANT }} ${{ env.ROOT }} ${{ env.DATE }} ${{ env.ARTIFACT }}
+        ./build.sh
+
+    - name: Move ZIP to Artifact
+      run: |
+        mv kernel_workspace/*.zip ${{ env.ARTIFACT }}/
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: crDroid-surya-${{ env.VARIANT }}-${{ env.ROOT }}-${{ env.DATE }}
+        name: crDroid-surya-${{ env.DATE }}
         path: ${{ env.ARTIFACT }}/*
