@@ -57,16 +57,16 @@ jobs:
       run: |
         # Memastikan direktori tujuan ada dan salin config dari repo lokal
         mkdir -p kernel_workspace/arch/arm64/configs/
-        cp root/configs/droidspaces.config kernel_workspace/arch/arm64/configs/
-        cp root/configs/droidspaces-additional.config kernel_workspace/arch/arm64/configs/ || true
+        cp configs/droidspaces.config kernel_workspace/arch/arm64/configs/
+        cp configs/droidspaces-additional.config kernel_workspace/arch/arm64/configs/ || true
 
     - name: Patch build.sh with buildpatch.sh
       run: |
         # Berikan izin eksekusi pada patcher dan build.sh asli
-        chmod +x root/patch/buildpatch.sh
+        chmod +x patch/buildpatch.sh
         chmod +x build.sh
         # Jalankan patcher untuk menyisipkan logika droidspaces ke build.sh
-        ./root/patch/buildpatch.sh build.sh
+        ./patch/buildpatch.sh build.sh
 
     - name: Download and Apply All Droidspaces Patches
       run: |
