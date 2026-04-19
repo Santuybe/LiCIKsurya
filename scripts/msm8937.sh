@@ -5,10 +5,11 @@
 
 SECONDS=0
 DEVICE="msm8937"
-DEFCONFIG="msm8937_defconfig"
+DEFCONFIG="vendor/msm8937_defconfig"
 COMMIT_HASH=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 ZIPNAME="LiCIK-${DEVICE}-${COMMIT_HASH}-$(date '+%Y%m%d-%H%M').zip"
-TC_DIR="$(pwd)/tc/clang-498229"
+TC_DIR="$(pwd)/tc/neutron-clang"
+GCC_DIR="$(pwd)/tc/gcc"
 AK3_DIR="$(pwd)/android/AnyKernel3"
 
 jules_ci_fixer() {
@@ -18,12 +19,27 @@ jules_ci_fixer() {
     echo "Jules CI-fixer completed."
 }
 
-export PATH="$TC_DIR/bin:$PATH"
-
 if ! [ -d "$TC_DIR" ]; then
-    echo "Cloning toolchain..."
-    git clone --depth=1 -b 17 https://gitlab.com/ThankYouMario/android_prebuilts_clang-standalone "$TC_DIR"
+    echo "Downloading Neutron Clang..."
+    mkdir -p "$TC_DIR"
+    cd "$TC_DIR"
+    curl -LO "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman"
+    chmod +x antman
+    ./antman -S
+    ./antman --patch=glibc
+    cd ../..
 fi
+
+if ! [ -d "$GCC_DIR" ]; then
+    echo "Downloading ARM GNU Toolchain..."
+    mkdir -p "$GCC_DIR"
+    cd "$GCC_DIR"
+    wget -q https://developer.arm.com/-/media/Files/downloads/gnu/14.2.rel1/binrel/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
+    tar -xf arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
+    cd ../..
+fi
+
+export PATH="$TC_DIR/bin:$GCC_DIR/arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu/bin:$PATH"
 
 jules_ci_fixer
 
@@ -49,37 +65,34 @@ echo -e "\nStarting compilation...\n"
 make -j$(nproc --all) O=out ARCH=arm64 \
     CC=clang \
     LD=ld.lld \
-    AS=llvm-as \
     AR=llvm-ar \
     NM=llvm-nm \
     OBJCOPY=llvm-objcopy \
     OBJDUMP=llvm-objdump \
     STRIP=llvm-strip \
-    CROSS_COMPILE=aarch64-linux-gnu- \
+    CROSS_COMPILE=aarch64-none-linux-gnu- \
     CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
     LLVM=1 LLVM_IAS=1 Image.gz dtb.img dtbo.img || \
 make -j$(nproc --all) O=out ARCH=arm64 \
     CC=clang \
     LD=ld.lld \
-    AS=llvm-as \
     AR=llvm-ar \
     NM=llvm-nm \
     OBJCOPY=llvm-objcopy \
     OBJDUMP=llvm-objdump \
     STRIP=llvm-strip \
-    CROSS_COMPILE=aarch64-linux-gnu- \
+    CROSS_COMPILE=aarch64-none-linux-gnu- \
     CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
     LLVM=1 LLVM_IAS=1 Image.gz-dtb || \
 make -j$(nproc --all) O=out ARCH=arm64 \
     CC=clang \
     LD=ld.lld \
-    AS=llvm-as \
     AR=llvm-ar \
     NM=llvm-nm \
     OBJCOPY=llvm-objcopy \
     OBJDUMP=llvm-objdump \
     STRIP=llvm-strip \
-    CROSS_COMPILE=aarch64-linux-gnu- \
+    CROSS_COMPILE=aarch64-none-linux-gnu- \
     CROSS_COMPILE_COMPAT=arm-linux-gnueabi- \
     LLVM=1 LLVM_IAS=1 Image-dtb || \
 exit $?
