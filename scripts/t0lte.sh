@@ -18,12 +18,13 @@ esac
 ZIPNAME="LiCIK-${DEVICE}-${FEAT}-${DATE}.zip"
 
 TC_DIR="$(pwd)/tc/gcc-4.9-arm"
-AK3_DIR="$(pwd)/anykernel_boeffla-t0lte"
 
 if ! [ -d "$TC_DIR" ]; then
     echo "Downloading GCC 4.9 for ARM..."
     mkdir -p "$TC_DIR"
-    git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 "$TC_DIR"
+    wget -q https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9/archive/refs/heads/lineage-16.0.tar.gz -O gcc.tar.gz
+    tar -xzf gcc.tar.gz --strip-components=1 -C "$TC_DIR"
+    rm gcc.tar.gz
 fi
 
 export PATH="$TC_DIR/bin:$PATH"
@@ -56,13 +57,12 @@ kernel="out/arch/arm/boot/zImage"
 if [ -f "$kernel" ]; then
     echo -e "\nKernel compiled successfully! Zipping up...\n"
 
-    # Use AnyKernel3 from source tree
-    if [ -d "$AK3_DIR" ]; then
-        cp -r "$AK3_DIR" AnyKernel3
-    else
-        echo "AnyKernel3 directory not found in source!"
-        exit 1
-    fi
+    # Download AnyKernel3 template from the specific commit and directory
+    echo "Downloading AnyKernel3 template..."
+    wget -q https://github.com/html6405/android_kernel_samsung_smdk4412/archive/2a4f865d94e35f2b7bac491168fdd8e79ea71d75.zip -O source.zip
+    unzip -q source.zip
+    cp -r android_kernel_samsung_smdk4412-*/anykernel_boeffla-t0lte AnyKernel3
+    rm -rf source.zip android_kernel_samsung_smdk4412-*
 
     cp $kernel AnyKernel3/zImage
 
