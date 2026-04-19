@@ -89,8 +89,13 @@ jobs:
 
     - name: Setup Configs
       run: |
-        mkdir -p kernel_workspace/arch/arm64/configs/
-        cp configs/*.config kernel_workspace/arch/arm64/configs/
+        if [[ "${{ matrix.device }}" == "t0lte" ]]; then
+          ARCH_DIR="arm"
+        else
+          ARCH_DIR="arm64"
+        fi
+        mkdir -p kernel_workspace/arch/$ARCH_DIR/configs/
+        cp configs/*.config kernel_workspace/arch/$ARCH_DIR/configs/
 
     - name: Building
       run: |
