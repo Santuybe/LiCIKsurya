@@ -71,20 +71,6 @@ jobs:
       run: |
         git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_URL }} kernel_workspace
 
-    - name: Cache Toolchain
-      id: cache-toolchain
-      uses: actions/cache@v4
-      with:
-        path: kernel_workspace/tc/clang-498229
-        key: ${{ runner.os }}-toolchain-v17
-
-    - name: Cache AnyKernel3
-      id: cache-ak3
-      uses: actions/cache@v4
-      with:
-        path: kernel_workspace/android/AnyKernel3
-        key: ${{ runner.os }}-ak3-shinigami
-
     - name: Apply Patches
       run: |
         cd kernel_workspace
@@ -136,10 +122,9 @@ jobs:
         tag_name: ${{ matrix.device }}-${{ github.event.inputs.feature }}-${{ env.DATE }}
         files: ${{ env.ARTIFACT }}/*
         body: |
-          ## LiCIK Kernel for ${{ matrix.device }}
+          ## 🔖 LiCIK Kernel for ${{ matrix.device }}
 
-          **Feature:** ${{ github.event.inputs.feature }}
-          **Author:** ${{ steps.metadata.outputs.OWNER }}
-          **Kernel Source:** ${{ env.KERNEL_URL }}
-          **Kernel Version:** ${{ steps.metadata.outputs.KV }}
-          **Build Date:** ${{ env.DATE }}
+          - 🪪 **Author:** ${{ steps.metadata.outputs.OWNER }}
+          - 🎯 **Kernel Source:** ${{ env.KERNEL_URL }}
+          - 🧭 **Kernel Version:** ${{ steps.metadata.outputs.KV }}
+          - 📅 **Build Date:** ${{ env.DATE }}
