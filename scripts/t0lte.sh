@@ -39,12 +39,13 @@ make O=out ARCH=arm CROSS_COMPILE=arm-linux-androideabi- $DEFCONFIG
 
 # Merge features if requested
 if [[ "$1" == "droidspace" ]]; then
-    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm/configs/droidspacest0lte.config arch/arm/configs/droidspaces.config arch/arm/configs/droidspaces-additional.config
-    make O=out ARCH=arm CROSS_COMPILE=arm-linux-androideabi- olddefconfig
+    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm/configs/droidspacest0lte.config arch/arm/configs/droidspaces.config arch/arm/configs/droidspaces-additional.config arch/arm/configs/localversion-ds.config
 elif [[ "$1" == "nethunter" ]]; then
-    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm/configs/nethunter.config
-    make O=out ARCH=arm CROSS_COMPILE=arm-linux-androideabi- olddefconfig
+    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm/configs/nethunter.config arch/arm/configs/localversion-nh.config
+else
+    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm/configs/localversion-base.config
 fi
+make O=out ARCH=arm CROSS_COMPILE=arm-linux-androideabi- olddefconfig
 
 echo -e "\nStarting compilation...\n"
 make -j$(nproc --all) O=out ARCH=arm \

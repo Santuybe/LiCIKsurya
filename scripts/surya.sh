@@ -50,12 +50,13 @@ make O=out ARCH=arm64 olddefconfig
 
 # Merge features if requested
 if [[ "$1" == "droidspace" ]]; then
-    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm64/configs/droidspaces.config arch/arm64/configs/droidspaces-additional.config
-    make O=out ARCH=arm64 olddefconfig
+    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm64/configs/droidspaces.config arch/arm64/configs/droidspaces-additional.config arch/arm64/configs/localversion-ds.config
 elif [[ "$1" == "nethunter" ]]; then
-    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm64/configs/nethunter.config
-    make O=out ARCH=arm64 olddefconfig
+    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm64/configs/nethunter.config arch/arm64/configs/localversion-nh.config
+else
+    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm64/configs/localversion-base.config
 fi
+make O=out ARCH=arm64 olddefconfig
 
 echo -e "\nStarting compilation...\n"
 make -j$(nproc --all) O=out ARCH=arm64 \
