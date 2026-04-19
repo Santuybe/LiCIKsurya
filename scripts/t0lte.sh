@@ -22,9 +22,7 @@ TC_DIR="$(pwd)/tc/gcc-4.9-arm"
 if ! [ -d "$TC_DIR" ]; then
     echo "Downloading GCC 4.9 for ARM..."
     mkdir -p "$TC_DIR"
-    wget -q https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9/archive/refs/heads/lineage-16.0.tar.gz -O gcc.tar.gz
-    tar -xzf gcc.tar.gz --strip-components=1 -C "$TC_DIR"
-    rm gcc.tar.gz
+    GIT_TERMINAL_PROMPT=0 git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 "$TC_DIR"
 fi
 
 export PATH="$TC_DIR/bin:$PATH"
