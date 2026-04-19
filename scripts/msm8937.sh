@@ -57,7 +57,7 @@ make O=out ARCH=arm64 olddefconfig
 
 # Merge features if requested
 if [[ "$1" == "droidspace" ]]; then
-    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm64/configs/droidspaces.config arch/arm64/configs/droidspaces-additional.config
+    scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm64/configs/droidspacesmsm8937.config arch/arm64/configs/droidspaces-additional.config
     make O=out ARCH=arm64 olddefconfig
 elif [[ "$1" == "nethunter" ]]; then
     scripts/kconfig/merge_config.sh -O out -m out/.config arch/arm64/configs/nethunter.config
